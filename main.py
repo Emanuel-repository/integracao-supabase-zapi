@@ -1,7 +1,13 @@
 import os
+import logging
 import requests
 from dotenv import load_dotenv
 from supabase import create_client, Client
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 def carregar_variaveis_ambiente():
     load_dotenv()
@@ -15,7 +21,7 @@ def carregar_variaveis_ambiente():
     
     missing_vars = [key for key, val in env_vars.items() if not val and key != "ZAPI_CLIENT_TOKEN"]
     if missing_vars:
-        print(f"Variáveis de ambiente ausentes: {', '.join(missing_vars)}")
+        logging.error(f"Variáveis de ambiente ausentes: {', '.join(missing_vars)}")
         raise EnvironmentError("Configure o arquivo .env corretamente.")
         
     return env_vars
@@ -26,12 +32,12 @@ def buscar_contatos(supabase_url: str, supabase_key: str):
         response = supabase.table('contatos').select("*").execute()
         
         if not response.data:
-            print("Nenhum contato encontrado no Supabase.")
+            logging.warning("Nenhum contato encontrado no Supabase.")
             return []
             
         return response.data
     except Exception as e:
-        print(f"Erro ao buscar contatos no Supabase: {e}")
+        logging.error(f"Erro ao buscar contatos no Supabase: {e}")
         return []
 
 def enviar_mensagem(nome: str, telefone: str, instance: str, token: str, client_token: str):
@@ -52,12 +58,12 @@ def enviar_mensagem(nome: str, telefone: str, instance: str, token: str, client_
     
     try:
         response = requests.post(url, json=payload, headers=headers)
-        print(f"Mensagem enviada com sucesso para {nome} ({telefone}).")
+        logging.info(f"Mensagem enviada com sucesso para {nome} ({telefone}).")
     except requests.exceptions.RequestException as e:
-        print(f"Falha ao enviar mensagem para {nome} ({telefone}). Erro: {e}")
+        logging.error(f"Falha ao enviar mensagem para {nome} ({telefone}). Erro: {e}")
 
 def main():
-    print("Iniciando o script de integração Supabase + Z-API...")
+    logging.info("Iniciando o script de integração Supabase + Z-API...")
     
     try:
         env = carregar_variaveis_ambiente()
@@ -77,12 +83,12 @@ def main():
                     client_token=env["ZAPI_CLIENT_TOKEN"]
                 )
             else:
-                print(f"Contato ignorado (dados incompletos): {contato}")
+                logging.warning(f"Contato ignorado (dados incompletos): {contato}")
                 
-        print("Processo finalizado com sucesso.")
+        logging.info("Processo finalizado com sucesso.")
         
     except Exception as e:
-        print(f"Execução interrompida devido a um erro crítico: {e}")
+        logging.critical(f"Execução interrompida devido a um erro crítico: {e}")
 
 if __name__ == "__main__":
     main()
