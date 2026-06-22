@@ -1,4 +1,4 @@
-# Python WhatsApp Serviço de Automação
+# Python WhatsApp Automation Service
 
 Este projeto é uma ferramenta de automação backend desenvolvida em Python, projetada para integrar fluxos de dados de um banco PostgreSQL (Supabase) com a API do WhatsApp (Z-API).
 
@@ -12,12 +12,17 @@ A solução permite a leitura automática de contatos cadastrados e o disparo de
 * **Requests** (Requisições HTTP)
 * **Python-dotenv** (Gestão de variáveis de ambiente)
 
-## Funcionalidades
+## Setup da Tabela (Supabase)
 
-- **Integração de Banco de Dados:** Conexão segura e consulta de contatos via client oficial do Supabase.
-- **Automação de Mensagens:** Disparo em lote via REST API.
-- **Tratamento de Logs:** Monitoramento de status de execução (sucesso/erro) com persistência em arquivo local (`automacao.log`).
-- **Segurança:** Gestão de credenciais através de variáveis de ambiente (`.env`).
+Execute o comando abaixo no painel do Supabase (`SQL Editor` > `New query`) para estruturar a tabela utilizada pelo serviço:
+
+```sql
+CREATE TABLE contatos (
+  id SERIAL PRIMARY KEY,
+  nome TEXT NOT NULL,
+  telefone TEXT NOT NULL
+);
+```
 
 ## Como utilizar
 
@@ -41,7 +46,7 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configurar as Variáveis de Ambiente
-Crie um arquivo `.env` na raiz do projeto com as suas credenciais do Supabase e da Z-API:
+Crie um arquivo `.env` na raiz do projeto com as suas credenciais:
 ```env
 SUPABASE_URL=sua_url_do_supabase
 SUPABASE_KEY=sua_chave_anon_public
@@ -59,4 +64,4 @@ python main.py
 *Os eventos e o status de cada envio serão exibidos no terminal e salvos automaticamente no arquivo `automacao.log`.*
 
 ## Licença
-Este projeto é open-source sob a licença MIT. Sinta-se à vontade para utilizar e estender a solução.
+Este projeto é open-source. Sinta-se à vontade para utilizar e estender a solução.
